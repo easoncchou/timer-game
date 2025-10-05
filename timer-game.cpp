@@ -5,7 +5,9 @@ void drawGuy(int direction, int x, int alternateLegs);
 void updateGuy();
 int readButton();
 void printTime(int time);
-void timesUp(bool win);
+void updateTime();
+void timesUp();
+void stopTime();
 
 /*
  * LCD RS pin to digital pin 12
@@ -33,13 +35,12 @@ const int joystickSWPin = 8;
 
 int guyX = 0;  // guy's location
 int guyDirection = 0;
-int prevX = 0;
 int alternateLegs = 0;
 int delta = 1;
-int prevTime = 0;
+unsigned long prevTime = 0;
 int countTime = 0; // count up from 0 to 1000, where 1000 is 10 seconds
-int prevTimeGuy = 0; // another prevTime var for drawing the guy at a slower rate
-int guyUpdateTime = 500; // time between updates 
+unsigned long prevTimeGuy = 0; // another prevTime var for drawing the guy at a slower rate
+int guyUpdateTime = 500; // time between updates
 
 // make a custom characters:
 // backslash escape doesn't work so make my own
@@ -50,7 +51,8 @@ byte backslash[8] = {0b00000,
                      0b00010, 
                      0b00001, 
                      0b00000, 
-                     0b00000};
+                     0b00000
+};
 
 void setup() {
   // initialize LCD and set up the number of columns and rows:
@@ -68,21 +70,14 @@ void setup() {
 }
 
 void loop() {
-  int currTime = millis();
-  if (currTime - prevTime >= 10) {
-    countTime += 1;
-    prevTime = currTime;
-  }
-  if (countTime == 1001) {
-    timesUp(!readButton());
-    countTime = 0;
-  }
-
-  updateGuy();
   lcd.clear();
+  updateTime();
   printTime(countTime);
+  updateGuy();
   drawGuy(guyDirection, guyX, alternateLegs);
-  readButton();
+  if (readButton() == LOW) {
+    stopTime();
+  }
   delay(10);
 }
 
@@ -122,14 +117,13 @@ void drawGuy(int direction, int x, int alternateLegs) {
 }
 
 void updateGuy() {
-  int currTimeGuy = millis();
+  unsigned long currTimeGuy = millis();
   if (currTimeGuy - prevTimeGuy < guyUpdateTime) {
     return;
   }
   prevTimeGuy = currTimeGuy;
 
   // update the position of the guy
-  prevX = guyX;
   guyX = guyX + delta;
 
   if (guyX > 4) {     // right edge
@@ -138,10 +132,8 @@ void updateGuy() {
     delta = 1;
   }
 
-  // if the guy has moved, alternate leg animation
-  if (prevX != guyX) {
-    alternateLegs = !alternateLegs;
-  }
+  //alternate leg animation
+  alternateLegs = !alternateLegs;
 
   // update the direction of the guy for drawing
   if (delta < 0) {
@@ -151,7 +143,6 @@ void updateGuy() {
   }
 }
 
-// TODO: check against cheating by detecting rising edge in readButton
 int readButton() { 
   int res = digitalRead(joystickSWPin);
   // if (res == LOW) Serial.println("button pressed");
@@ -160,31 +151,67 @@ int readButton() {
 
 void printTime(int time) {
   // time should range from 0000 to 1000
+  if (time == 1500) {
+    lcd.setCursor(11, 0);
+    lcd.print("15.00");
+  }
   if (time == 1000) {
     lcd.setCursor(11, 0);
     lcd.print("10.00");
   } else {
-    lcd.setCursor(12, 0);
+    if (time > 1000) {
+      lcd.setCursor(11, 0);
+    } else {
+      lcd.setCursor(12, 0);
+    }
     lcd.print((time / 100));
     lcd.print(".");
     lcd.print((time % 100));
   }
 }
 
-void timesUp(bool win) {
-  lcd.setCursor(11, 1);
-  
-  if (win) {
-    lcd.print("WIN!!");
-  } else {
-    lcd.print("MISS!");
+void updateTime() {
+  unsigned long currTime = millis();
+  // increment the game time
+  if (currTime - prevTime >= 10) {
+    countTime += 1;
+    prevTime = currTime;
   }
-  
-  delay(3000);
-  do {
-  
-  } while (readButton() == HIGH);
+  // check if the player won the game
+  if (countTime == 1501) {
+    timesUp();
+  }
+}
 
+void timesUp() {
+  lcd.setCursor(11, 1);
+  lcd.print("OVER!");
+
+  delay(3000);
+  countTime = 0;
   return;
 }
+
+void stopTime() {
+  lcd.setCursor(11, 1);
+  if (countTime < 990) {
+    lcd.print("EARLY");
+  } else if (countTime >= 990 && countTime < 1000) {
+    lcd.print("GOOD.");
+  } else if (countTime == 1000) {
+    lcd.print("BEST!");
+  } else if (countTime > 1000 && countTime < 1010) {
+    lcd.print("GOOD.");
+  } else {
+    lcd.print("LATE");
+  }
+
+  delay(3000);
+  countTime = 0;
+  return;
+}
+
+
+
+
 
