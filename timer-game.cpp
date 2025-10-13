@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 
 // function prototypes
-void drawGuy(int direction, int x, int alternateLegs);
+void drawGuy(int x, int alternateLegs);
 void updateGuy();
 int readButton();
 void printTime(int time);
@@ -73,27 +73,26 @@ void loop() {
   updateTime();
   printTime(countTime);
   updateGuy();
-  drawGuy(guyDirection, guyX, alternateLegs);
+  drawGuy(guyX, alternateLegs);
   if (readButton() == LOW) {
     stopTime();
   }
   delay(10);
 }
 
-void drawGuy(int direction, int x, int alternateLegs) {
+void drawGuy(int x, int alternateLegs) {
   if (alternateLegs == 0) {
     lcd.setCursor(x, 0);
-    lcd.print("( ^_^)");
+    lcd.print("(^_^)");
     lcd.setCursor(x, 1);
-    lcd.print("/    ");
+    lcd.print(" |  |");
     lcd.write(byte(0));
   } else {
     lcd.setCursor(x, 0);
-    lcd.print("( ^_^)");
+    lcd.print("(^_^)");
     lcd.setCursor(x, 1);
-    lcd.print(" ");
+    lcd.print(" /  ");
     lcd.write(byte(0));
-    lcd.print("  /");
   }
 }
 
