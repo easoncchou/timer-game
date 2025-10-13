@@ -123,7 +123,7 @@ int readButton() {
 }
 
 void printTime(int time) {
-  // time should range from 0000 to 1000
+  // time should range from 0000 to 1500
   if (time == 1500) {
     lcd.setCursor(11, 0);
     lcd.print("15.00");
