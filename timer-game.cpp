@@ -34,7 +34,6 @@ const int joystickYPin = A1;
 const int joystickSWPin = 8;
 
 int guyX = 0;  // guy's location
-int guyDirection = 0;
 int alternateLegs = 0;
 int delta = 1;
 unsigned long prevTime = 0;
@@ -82,37 +81,19 @@ void loop() {
 }
 
 void drawGuy(int direction, int x, int alternateLegs) {
-  // direction=0 is right, =1 is left
-  if (direction == 0) {
-    if (alternateLegs == 0) {
-      lcd.setCursor(x, 0);
-      lcd.print("( ^_^)");
-      lcd.setCursor(x, 1);
-      lcd.print("/    ");
-      lcd.write(byte(0));
-    } else {
-      lcd.setCursor(x, 0);
-      lcd.print("( ^_^)");
-      lcd.setCursor(x, 1);
-      lcd.print(" ");
-      lcd.write(byte(0));
-      lcd.print("  /");
-    }
+  if (alternateLegs == 0) {
+    lcd.setCursor(x, 0);
+    lcd.print("( ^_^)");
+    lcd.setCursor(x, 1);
+    lcd.print("/    ");
+    lcd.write(byte(0));
   } else {
-    if (alternateLegs == 0) {
-      lcd.setCursor(x, 0);
-      lcd.print("(^_^ )");
-      lcd.setCursor(x, 1);
-      lcd.print("/    ");
-      lcd.write(byte(0));
-    } else {
-      lcd.setCursor(x, 0);
-      lcd.print("(^_^ )");
-      lcd.setCursor(x, 1);
-      lcd.print(" ");
-      lcd.write(byte(0));
-      lcd.print("  /");
-    }
+    lcd.setCursor(x, 0);
+    lcd.print("( ^_^)");
+    lcd.setCursor(x, 1);
+    lcd.print(" ");
+    lcd.write(byte(0));
+    lcd.print("  /");
   }
 }
 
@@ -134,13 +115,6 @@ void updateGuy() {
 
   //alternate leg animation
   alternateLegs = !alternateLegs;
-
-  // update the direction of the guy for drawing
-  if (delta < 0) {
-    guyDirection = 1; // face left
-  } else if (delta > 0) {
-    guyDirection = 0; // face right
-  }
 }
 
 int readButton() { 
