@@ -85,13 +85,12 @@ void drawGuy(int x, int alternateLegs) {
     lcd.setCursor(x, 0);
     lcd.print("(^_^)");
     lcd.setCursor(x, 1);
-    lcd.print(" |  |");
-    lcd.write(byte(0));
+    lcd.print("|   |");
   } else {
     lcd.setCursor(x, 0);
     lcd.print("(^_^)");
     lcd.setCursor(x, 1);
-    lcd.print(" /  ");
+    lcd.print("/   ");
     lcd.write(byte(0));
   }
 }
@@ -106,7 +105,7 @@ void updateGuy() {
   // update the position of the guy
   guyX = guyX + delta;
 
-  if (guyX > 4) {     // right edge
+  if (guyX > 5) {     // right edge
     delta = -1;
   } else if (guyX < 1) {  // left edge
     delta = 1;
@@ -183,8 +182,3 @@ void stopTime() {
   countTime = 0;
   return;
 }
-
-
-
-
-
